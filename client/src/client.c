@@ -1,5 +1,4 @@
 #include "client.h"
-
 int main(void)
 {
 	/*---------------------------------------------------PARTE 2-------------------------------------------------------------*/
@@ -18,16 +17,20 @@ int main(void)
 
 	// Usando el logger creado previamente
 	// Escribi: "Hola! Soy un log"
-
-
+	
 	/* ---------------- ARCHIVOS DE CONFIGURACION ---------------- */
 
 	config = iniciar_config();
-
+	config = config_create("cliente.config");
+	valor = config_get_string_value(config, "CLAVE"); 
 	// Usando el config creado previamente, leemos los valores del config y los 
 	// dejamos en las variables 'ip', 'puerto' y 'valor'
 
 	// Loggeamos el valor de config
+	logger = log_create("tp0.log", "log", 1, LOG_LEVEL_INFO); 
+	log_info(logger, valor); 
+	log_destroy(logger); 
+	config_destroy(config); 
 
 
 	/* ---------------- LEER DE CONSOLA ---------------- */
@@ -95,6 +98,7 @@ void paquete(int conexion)
 
 void terminar_programa(int conexion, t_log* logger, t_config* config)
 {
+	
 	/* Y por ultimo, hay que liberar lo que utilizamos (conexion, log y config) 
 	  con las funciones de las commons y del TP mencionadas en el enunciado */
 }
