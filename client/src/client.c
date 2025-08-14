@@ -1,4 +1,8 @@
 #include "client.h"
+#include <readline/readline.h>
+#include <readline/history.h>
+#include <string.h>
+
 int main(void)
 {
 	/*---------------------------------------------------PARTE 2-------------------------------------------------------------*/
@@ -23,20 +27,25 @@ int main(void)
 	config = iniciar_config();
 	config = config_create("cliente.config");
 	valor = config_get_string_value(config, "CLAVE"); 
+	ip = config_get_string_value(config, "IP");
+	puerto = config_get_string_value(config, "PUERTO");
 	// Usando el config creado previamente, leemos los valores del config y los 
 	// dejamos en las variables 'ip', 'puerto' y 'valor'
 
 	// Loggeamos el valor de config
 	logger = log_create("tp0.log", "log", 1, LOG_LEVEL_INFO); 
 	log_info(logger, valor); 
-	log_destroy(logger); 
-	config_destroy(config); 
+	
 
 
 	/* ---------------- LEER DE CONSOLA ---------------- */
 
 	leer_consola(logger);
-
+	char *consola = readline("> "); 
+	if (strcmp(consola, "\0")) {
+		log_info(logger, consola); 
+	}
+	free(consola); 
 	/*---------------------------------------------------PARTE 3-------------------------------------------------------------*/
 
 	// ADVERTENCIA: Antes de continuar, tenemos que asegurarnos que el servidor esté corriendo para poder conectarnos a él
@@ -48,7 +57,8 @@ int main(void)
 
 	// Armamos y enviamos el paquete
 	paquete(conexion);
-
+	config_destroy(config); 
+	log_destroy(logger); 
 	terminar_programa(conexion, logger, config);
 
 	/*---------------------------------------------------PARTE 5-------------------------------------------------------------*/
