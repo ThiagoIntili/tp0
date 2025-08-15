@@ -41,11 +41,7 @@ int main(void)
 	/* ---------------- LEER DE CONSOLA ---------------- */
 
 	leer_consola(logger);
-	char *consola = readline("> "); 
-	if (strcmp(consola, "\0")) {
-		log_info(logger, consola); 
-	}
-	free(consola); 
+	
 	/*---------------------------------------------------PARTE 3-------------------------------------------------------------*/
 
 	// ADVERTENCIA: Antes de continuar, tenemos que asegurarnos que el servidor esté corriendo para poder conectarnos a él
@@ -55,10 +51,18 @@ int main(void)
 
 	// Enviamos al servidor el valor de CLAVE como mensaje
 
+	int bytes = send(conexion, &valor, sizeof(valor), 0);
+	if(bytes == -1) {
+		log_info(logger, "fallo el envio");
+	} else {
+		log_info(logger, "se ha enviado el mensaje"); 
+	}
+
 	// Armamos y enviamos el paquete
 	paquete(conexion);
-	config_destroy(config); 
-	log_destroy(logger); 
+	
+
+	
 	terminar_programa(conexion, logger, config);
 
 	/*---------------------------------------------------PARTE 5-------------------------------------------------------------*/
@@ -85,8 +89,12 @@ void leer_consola(t_log* logger)
 
 	// La primera te la dejo de yapa
 	leido = readline("> ");
-
+	log_info(logger, leido); 
 	// El resto, las vamos leyendo y logueando hasta recibir un string vacío
+	if (strcmp(leido, "\0")) {
+		log_info(logger, leido); 
+	}
+	free(leido); 
 
 
 	// ¡No te olvides de liberar las lineas antes de regresar!
@@ -100,15 +108,24 @@ void paquete(int conexion)
 	t_paquete* paquete;
 
 	// Leemos y esta vez agregamos las lineas al paquete
-
-
-	// ¡No te olvides de liberar las líneas y el paquete antes de regresar!
+	leido = readline("> ");
+	if (strcmp(leido, "\0")) {
+		int bytes = send(conexion, &leido, sizeof(leido), 0);
+		if(bytes == -1) {
+			printf("fallo el envio del paquete"); 
+		}
+	}
 	
+	// ¡No te olvides de liberar las líneas y el paquete antes de regresar!
+	free(leido); 
+	free(paquete); 
 }
 
 void terminar_programa(int conexion, t_log* logger, t_config* config)
 {
-	
+	config_destroy(config); 
+	log_destroy(logger); 
+	close(conexion); 
 	/* Y por ultimo, hay que liberar lo que utilizamos (conexion, log y config) 
 	  con las funciones de las commons y del TP mencionadas en el enunciado */
 }

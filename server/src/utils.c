@@ -1,11 +1,10 @@
 #include"utils.h"
+#include <commons/error.h>
 
 t_log* logger;
 
 int iniciar_servidor(void)
 {
-	// Quitar esta línea cuando hayamos terminado de implementar la funcion
-	assert(!"no implementado!");
 
 	int socket_servidor;
 	struct addrinfo hints, *servinfo, *p;
@@ -15,40 +14,44 @@ int iniciar_servidor(void)
 	hints.ai_socktype = SOCK_STREAM;
 	hints.ai_flags = AI_PASSIVE;
 
-	int address = getaddrinfo(NULL, PUERTO, &hints, &servinfo);
+	int error = getaddrinfo(NULL, PUERTO, &hints, &servinfo);
+	error_show(strerror(error)); 
 
-	int fd_conexion = socket(server_info->ai_family,
-                         server_info->ai_socktype,
-                         server_info->ai_protocol);
+	socket_servidor = socket(servinfo->ai_family,
+                         servinfo->ai_socktype,
+                         servinfo->ai_protocol);
 
 	// Creamos el socket de escucha del servidor
 
-	address = setsockopt(fd_escucha, SOL_SOCKET, SO_REUSEPORT, &(int){1}, sizeof(int));
-
-	address = bind(fd_escucha, server_info->ai_addr, server_info->ai_addrlen);
-
-	address = listen(fd_escucha, SOMAXCONN);
-
+	error = setsockopt(socket_servidor, SOL_SOCKET, SO_REUSEPORT, &(int){1}, sizeof(int));
+	error_show(strerror(error)); 
 
 	// Asociamos el socket a un puerto
 
+	error = bind(socket_servidor, servinfo->ai_addr, servinfo->ai_addrlen);
+	error_show(strerror(error)); 
+
+	
+
 	// Escuchamos las conexiones entrantes
 
+	error = listen(socket_servidor, SOMAXCONN);
+	error_show(strerror(error)); 
+	t_log *logger = log_create("tp0_server.log", "log", 1, LOG_LEVEL_INFO); 
 	freeaddrinfo(servinfo);
 	log_trace(logger, "Listo para escuchar a mi cliente");
-
+	log_destroy(logger);  
 	return socket_servidor;
 }
 
 int esperar_cliente(int socket_servidor)
 {
-	// Quitar esta línea cuando hayamos terminado de implementar la funcion
-	assert(!"no implementado!");
 
 	// Aceptamos un nuevo cliente
-	int socket_cliente;
+	int socket_cliente = accept(socket_servidor, NULL, NULL);
+	t_log *logger = log_create("tp0_server.log", "log", 1, LOG_LEVEL_INFO);
 	log_info(logger, "Se conecto un cliente!");
-
+	log_destroy(logger);  
 	return socket_cliente;
 }
 
