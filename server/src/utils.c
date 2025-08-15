@@ -8,7 +8,6 @@ int iniciar_servidor(void)
 	assert(!"no implementado!");
 
 	int socket_servidor;
-
 	struct addrinfo hints, *servinfo, *p;
 
 	memset(&hints, 0, sizeof(hints));
@@ -16,9 +15,20 @@ int iniciar_servidor(void)
 	hints.ai_socktype = SOCK_STREAM;
 	hints.ai_flags = AI_PASSIVE;
 
-	getaddrinfo(NULL, PUERTO, &hints, &servinfo);
+	int address = getaddrinfo(NULL, PUERTO, &hints, &servinfo);
+
+	int fd_conexion = socket(server_info->ai_family,
+                         server_info->ai_socktype,
+                         server_info->ai_protocol);
 
 	// Creamos el socket de escucha del servidor
+
+	address = setsockopt(fd_escucha, SOL_SOCKET, SO_REUSEPORT, &(int){1}, sizeof(int));
+
+	address = bind(fd_escucha, server_info->ai_addr, server_info->ai_addrlen);
+
+	address = listen(fd_escucha, SOMAXCONN);
+
 
 	// Asociamos el socket a un puerto
 
